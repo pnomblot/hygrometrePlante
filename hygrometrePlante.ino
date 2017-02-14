@@ -23,7 +23,7 @@ Adafruit_SSD1306 display(OLED_RESET);
 
 //************************** BUTTON **********************************
 #define BUTTON1_PIN     4
-Button button1 = Button(BUTTON1_PIN,BUTTON_PULLDOWN);
+Button button1 = Button(BUTTON1_PIN,BUTTON_PULLUP_INTERNAL);
 int screen = 0; 
 int button = 0;
 
