@@ -1,8 +1,8 @@
-#include <SPI.h>
-#include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 #include <Button.h>
+#include "Graphiques.h"
+#include "Font24x40.h"
 
 
 //************************** RTC *************************************
@@ -42,14 +42,6 @@ int button = 0;
 #define DEGRES  2
 #define VOLTS   3
 
-
-
-extern uint8_t Font24x40[];
-extern uint8_t Symbol[];
-extern uint8_t Splash[];
-extern uint8_t Arroser[];
-extern uint8_t Plante[];
-extern uint8_t Battery[];
 
 void showTime(struct DateTime t);
 unsigned long loopTick; 
@@ -112,7 +104,7 @@ void loop() {
     
     case 0: // moisture
       now = RTC.now();
-      moisture = (100*double(MOISTUREMAX-MOISTUREOFFSET-(analogRead(MOISTURESENSOR) - MOISTUREOFFSET)))/(MOISTUREMAX-MOISTUREOFFSET);
+      moisture = abs(100*double(MOISTUREMAX-MOISTUREOFFSET-(analogRead(MOISTURESENSOR) - MOISTUREOFFSET)))/(MOISTUREMAX-MOISTUREOFFSET);
       //Serial.println(analogRead(MOISTURESENSOR));
       display.clearDisplay(); 
       showBatterylevel(readVcc());
@@ -125,13 +117,13 @@ void loop() {
         digitalWrite(ARROSAGE, LOW);
       } 
             
-      drawPercentValue(30,20,int(moisture));
+      drawPercentValue(30,20,  int(moisture));
       display.display();
     break;
 
 
     case 1:  // Battery
-     digitalWrite(ARROSAGE, LOW);
+      digitalWrite(ARROSAGE, LOW);
 
       vcc = readVcc();
       if (lastVcc != vcc) {
@@ -232,12 +224,12 @@ void drawSymbol(int sx, int sy, int num) {
 }
 
 
-void drawPercentValue(int sx, int sy, int val) {
+void drawPercentValue(int sx, int sy, unsigned int val) {
     char charBuf[5];
     if (val > 100) val = 100;
     itoa(val, charBuf, 10); 
     
-    int nbCar = strlen(charBuf);
+   int nbCar = strlen(charBuf);
     drawBigCar(sx+52, sy, charBuf[nbCar-1]- '0');
     if (--nbCar > 0) drawBigCar(sx+26, sy, charBuf[nbCar-1]- '0');
     if (--nbCar > 0) drawBigCar(sx, sy, charBuf[nbCar-1]- '0');
@@ -247,7 +239,7 @@ void drawPercentValue(int sx, int sy, int val) {
 
 // Affiche un nombre decimal
 void drawFloatValue(int sx, int sy, double val, int unit) {
-  char charBuf[15];
+  char charBuf[10];
   if (val < 10000) {
     dtostrf(val, 3, 1, charBuf); 
     int nbCar = strlen(charBuf);
